@@ -13,6 +13,7 @@ enum Operation {
     Remove,
     List,
     Quit,
+    Mark,
 }
 
 #[derive(Parser)]
@@ -69,6 +70,19 @@ fn list_todos() -> Result<(), serde_json::Error> {
     Ok(())
 }
 
+fn mark_finished(id: u32) -> Result<(), serde_json::Error> {
+    let mut todos=load_todos()?;
+    for todo in todos.iter_mut(){
+        if todo.id==id{
+            todo.completed=true;
+        }
+    }
+    let file=File::create("data/todo.json").unwrap();
+    let writer=BufWriter::new(file);
+    serde_json::to_writer_pretty(writer,&todos)?;
+    Ok(())
+}
+
 fn main() {
     let args = Args::parse();
     loop {
@@ -90,6 +104,11 @@ fn main() {
             }
             Operation::List => {
                 list_todos().unwrap();
+                break;
+            }
+            Operation::Mark => {
+                mark_finished(args.id.unwrap()).unwrap();
+                println!("标记完成");
                 break;
             }
             Operation::Quit => {

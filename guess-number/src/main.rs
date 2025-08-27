@@ -14,7 +14,12 @@ fn main() {
     loop {
         println!("请输入一个数字");
         let mut guess = String::new();
+        //这里用&mut的目的是为了可变引用，因为read_line会修改guess的值
+        //guess的所有权从main函数转移到read_line函数，所以需要可变引用
         io::stdin().read_line(&mut guess).expect("无法读取行");
+        //这里parse返回的是Result类型，所以需要match来处理
+        //如果解析成功，则将结果赋值给guess_num
+        //如果解析失败，则打印错误信息，并继续循环
         let guess_num: i32 = match guess.trim().parse() {
             Ok(num) => num,
             Err(_) => {

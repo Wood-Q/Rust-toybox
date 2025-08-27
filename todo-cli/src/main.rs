@@ -49,14 +49,19 @@ fn add_todo(todo: Todo) -> Result<(), serde_json::Error> {
     todos.push(new_todo);
     let file = File::create("data/todo.json").unwrap();
     let writer = BufWriter::new(file);
+    //to_writer_pretty是serde_json提供的，用于将结构体序列化为pretty的json格式
     serde_json::to_writer_pretty(writer, &todos).unwrap();
     Ok(())
 }
 
 fn remove_todo(id: u32) -> Result<(), serde_json::Error> {
     let mut todos = load_todos()?;
+    //retain用于过滤掉不满足条件的元素，这里过滤掉id不等于id的元素
     todos.retain(|todo| todo.id != id);
+    //File::create用于创建文件，如果文件不存在，则创建文件，如果文件存在，则覆盖文件
     let file = File::create("data/todo.json").unwrap();
+    //BufWriter是用于缓冲写入的，可以提高写入效率
+    //和普通写入的区别是，普通写入会直接写入文件，而BufWriter会先写入缓冲区，然后一次性写入文件，这样可以提高写入效率
     let writer = BufWriter::new(file);
     serde_json::to_writer_pretty(writer, &todos)?;
     Ok(())
